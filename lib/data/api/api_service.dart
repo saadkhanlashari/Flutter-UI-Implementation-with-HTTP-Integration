@@ -26,22 +26,28 @@ class ApiService extends GetxController {
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse(AppConstants.basenUrl));
+    try {
+      final response = await http.get(Uri.parse(AppConstants.basenUrl));
 
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      final result = jsonDecode(response.body);
-      futureAlbum =
-          List<Images>.from(result['data'].map((x) => Images.fromJson(x)));
-      update();
-      log(futureAlbum.first.icon.toString());
-    } else if (response.statusCode == 404) {
-    } else if (response.statusCode == 401) {
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load album');
+      if (response.statusCode == 200) {
+        // If the server returned a 200 OK response, parse the JSON.
+        final result = jsonDecode(response.body);
+        futureAlbum =
+            List<Images>.from(result['data'].map((x) => Images.fromJson(x)));
+        update();
+        log(futureAlbum.first.icon.toString());
+      } else if (response.statusCode == 404) {
+        // Handle 404 Not Found response here
+      } else if (response.statusCode == 401) {
+        // Handle 401 Unauthorized response here
+      } else {
+        // Handle other response codes
+        throw Exception('Failed to load album');
+      }
+    } catch (e) {
+      // Handle any exceptions that may occur during the HTTP request.
+      print('An error occurred: $e');
+      // You can add further error handling or log the error message as needed.
     }
   }
 }
